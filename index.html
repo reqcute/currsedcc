@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Logger • Secure Access</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600&display=swap');
+        
+        :root {
+            --primary: #00ff88;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a, #1a1a2e);
+            color: #fff;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            padding-bottom: 1.5rem;
+        }
+        
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: -2px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo::before {
+            content: '●';
+            color: var(--primary);
+            animation: pulse 2s infinite;
+        }
+        
+        .main-page, .admin-page {
+            display: none;
+            animation: fadeIn 0.6s ease forwards;
+        }
+        
+        .main-page.active, .admin-page.active {
+            display: block;
+        }
+        
+        .card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            font-size: 3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, #00ff88, #00cc66);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .ip-box {
+            background: #111;
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+            border: 2px solid var(--primary);
+            font-size: 1.5rem;
+            font-family: monospace;
+        }
+        
+        .status {
+            color: var(--primary);
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .admin-login {
+            max-width: 420px;
+            margin: 8rem auto;
+        }
+        
+        input[type="password"] {
+            width: 100%;
+            padding: 1.2rem 1.5rem;
+            background: #111;
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-radius: 16px;
+            color: #fff;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            font-family: monospace;
+            transition: all 0.3s;
+        }
+        
+        input[type="password"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(0, 255, 136, 0.2);
+        }
+        
+        button {
+            width: 100%;
+            padding: 1.2rem;
+            background: var(--primary);
+            color: #000;
+            font-weight: 600;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 255, 136, 0.4);
+        }
+        
+        .logs-container {
+            margin-top: 2rem;
+        }
+        
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #111;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        th, td {
+            padding: 1.2rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        th {
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--primary);
+            font-weight: 500;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .ip-cell {
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: #00ff88;
+        }
+        
+        .time-cell {
+            color: #aaa;
+            font-size: 0.95rem;
+        }
+        
+        .empty {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .footer {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.85rem;
+            color: #555;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <header>
+            <div class="logo">
+                IP<span style="color:#fff;">TRACKER</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem; font-size: 1rem;">
+                <div style="background: rgba(0,255,136,0.1); color: #00ff88; padding: 6px 14px; border-radius: 9999px; font-size: 0.85rem; font-weight: 500;">
+                    LIVE
+                </div>
+                <button onclick="switchToAdmin()" 
+                        style="background: transparent; border: 2px solid #00ff88; color: #00ff88; padding: 10px 24px; border-radius: 9999px; font-weight: 600; cursor: pointer;">
+                    🔒 ADMIN PANEL
+                </button>
+            </div>
+        </header>
+
+        <!-- MAIN PAGE -->
+        <div id="mainPage" class="main-page active">
+            <div class="card">
+                <h1>Visitor IP Logger</h1>
+                <p style="font-size: 1.3rem; color: #aaa; margin-bottom: 2rem;">
+                    Every visitor's IP address is automatically captured and stored securely.
+                </p>
+                
+                <div id="ipDisplay" class="ip-box">
+                    <div style="margin-bottom: 1rem; font-size: 1rem; color: #666;">DETECTING YOUR IP...</div>
+                    <div id="ipValue" style="font-size: 2.5rem; font-weight: 600; letter-spacing: 4px; margin-bottom: 0.5rem;">•••.•••.•••.•••</div>
+                    <div id="status" class="status">
+                        <span id="statusDot" style="display: inline-block; width: 12px; height: 12px; background: #00ff88; border-radius: 50%; animation: pulse 2s infinite;"></span>
+                        IP successfully logged
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 2rem; font-size: 1.1rem; color: #666;">
+                    This page logs every visitor automatically.<br>
+                    <strong style="color: #00ff88;">Your IP has been recorded.</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADMIN PAGE -->
+        <div id="adminPage" class="admin-page">
+            <div class="card admin-login">
+                <h1 style="text-align: center; margin-bottom: 2rem;">Admin Access</h1>
+                <p style="text-align: center; color: #aaa; margin-bottom: 2rem;">
+                    Enter the password to view all visitor IPs
+                </p>
+                
+                <input type="password" id="passwordInput" placeholder="Enter password" autocomplete="off">
+                
+                <button onclick="verifyPassword()">UNLOCK LOGS</button>
+                
+                <div id="errorMsg" style="color: #ff3366; text-align: center; margin-top: 1rem; display: none;">
+                    Incorrect password
+                </div>
+                
+                <!-- LOGS DISPLAY -->
+                <div id="logsSection" style="display: none; margin-top: 3rem;">
+                    <div class="log-header">
+                        <h2 style="font-size: 1.8rem;">📋 All Visitor IP Logs</h2>
+                        <button onclick="clearLogs()" 
+                                style="background: transparent; color: #ff3366; border: 1px solid #ff3366; padding: 8px 16px; border-radius: 9999px; font-size: 0.9rem;">
+                            CLEAR ALL
+                        </button>
+                    </div>
+                    
+                    <div id="logsTableContainer">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 40%;">IP ADDRESS</th>
+                                    <th style="width: 40%;">TIMESTAMP</th>
+                                    <th style="width: 20%; text-align: center;">VISIT #</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logsBody">
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div id="emptyState" class="empty" style="display: none;">
+                        No visitors yet.<br>
+                        Open this page in another tab/browser to test live logging.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Single-file HTML demo • Data stored locally in your browser
+    </div>
+
+    <script>
+        let ipLogs = JSON.parse(localStorage.getItem('ipTrackerLogs')) || [];
+        
+        async function captureIP() {
+            const ipDisplay = document.getElementById('ipValue');
+            const statusDot = document.getElementById('statusDot');
+            
+            ipDisplay.textContent = 'CONNECTING...';
+            
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                const ip = data.ip;
+                const timestamp = new Date().toISOString();
+                
+                ipLogs.unshift({
+                    ip: ip,
+                    timestamp: timestamp,
+                    visitNumber: ipLogs.length + 1
+                });
+                
+                localStorage.setItem('ipTrackerLogs', JSON.stringify(ipLogs));
+                
+                ipDisplay.innerHTML = `<span style="color:#00ff88;">${ip}</span>`;
+                
+                document.getElementById('status').innerHTML = `
+                    <span style="display: inline-block; width: 12px; height: 12px; background: #00ff88; border-radius: 50%; animation: pulse 2s infinite;"></span>
+                    IP successfully logged • ${new Date(timestamp).toLocaleTimeString()}
+                `;
+                
+            } catch (error) {
+                // Fallback for demo when API fails
+                const fallbackIP = '192.168.' + Math.floor(Math.random()*255) + '.' + Math.floor(Math.random()*255);
+                const timestamp = new Date().toISOString();
+                
+                ipLogs.unshift({
+                    ip: fallbackIP,
+                    timestamp: timestamp,
+                    visitNumber: ipLogs.length + 1
+                });
+                
+                localStorage.setItem('ipTrackerLogs', JSON.stringify(ipLogs));
+                
+                ipDisplay.innerHTML = `<span style="color:#ffaa00;">${fallbackIP} (DEMO)</span>`;
+                document.getElementById('status').innerHTML = `
+                    <span style="color:#ffaa00;">⚠️</span> Demo IP logged
+                `;
+            }
+        }
+        
+        function renderLogs() {
+            const tbody = document.getElementById('logsBody');
+            const emptyState = document.getElementById('emptyState');
+            const logsContainer = document.getElementById('logsTableContainer');
+            
+            tbody.innerHTML = '';
+            
+            if (ipLogs.length === 0) {
+                emptyState.style.display = 'block';
+                logsContainer.style.display = 'none';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            logsContainer.style.display = 'block';
+            
+            ipLogs.forEach((log) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="ip-cell">${log.ip}</td>
+                    <td class="time-cell">${new Date(log.timestamp).toLocaleString('en-US', {
+                        month: 'short', day: 'numeric', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit', second: '2-digit'
+                    })}</td>
+                    <td style="text-align: center; font-family: monospace; color: #00ff88;">#${log.visitNumber}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        function verifyPassword() {
+            const enteredPass = document.getElementById('passwordInput').value.trim();
+            const errorMsg = document.getElementById('errorMsg');
+            const logsSection = document.getElementById('logsSection');
+            
+            if (enteredPass === '67_67') {
+                errorMsg.style.display = 'none';
+                logsSection.style.display = 'block';
+                renderLogs();
+                
+                const btn = document.querySelector('#adminPage button');
+                const originalText = btn.textContent;
+                btn.textContent = '✅ ACCESS GRANTED';
+                btn.style.background = '#00ff88';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                }, 1200);
+            } else {
+                errorMsg.style.display = 'block';
+                setTimeout(() => errorMsg.style.display = 'none', 2000);
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+        
+        function switchToAdmin() {
+            document.getElementById('mainPage').classList.remove('active');
+            document.getElementById('adminPage').classList.add('active');
+            document.getElementById('passwordInput').focus();
+        }
+        
+        function clearLogs() {
+            if (confirm('Delete ALL logged IP addresses?')) {
+                ipLogs = [];
+                localStorage.removeItem('ipTrackerLogs');
+                renderLogs();
+            }
+        }
+        
+        // Initialize
+        window.onload = function() {
+            captureIP();
+            document.getElementById('mainPage').classList.add('active');
+            
+            console.log('%cIP Logger loaded - Password: 67_67 (not shown publicly)', 'color:#00ff88');
+        };
+    </script>
+</body>
+</html>
