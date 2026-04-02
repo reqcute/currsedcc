@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visitor IP Logs</title>
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0b111f;
+    color: white;
+    padding: 20px;
+}
+pre {
+    background: rgba(255,255,255,0.05);
+    padding: 20px;
+    border-radius: 10px;
+}
+h1 {
+    text-align: center;
+}
+</style>
+</head>
+<body>
+
+<h1>Visitor IP Logs</h1>
+<pre id="logs">Loading...</pre>
+
+<script>
+// Fetch logged IPs
+fetch("/api/logs")
+    .then(res => res.text())
+    .then(data => {
+        document.getElementById("logs").textContent = data;
+    })
+    .catch(() => {
+        document.getElementById("logs").textContent = "Unable to fetch logs.";
+    });
+</script>
+
+</body>
+</html>
