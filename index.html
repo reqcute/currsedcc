@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your IP</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0b111f;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    text-align: center;
+    background: rgba(255,255,255,0.05);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+h1 {
+    margin-bottom: 10px;
+}
+
+.ip {
+    font-size: 28px;
+    font-weight: bold;
+    color: #4da6ff;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Your IP Address</h1>
+    <div class="ip" id="ip">Loading...</div>
+</div>
+
+<script>
+fetch("https://api.ipify.org?format=json")
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById("ip").textContent = data.ip;
+    })
+    .catch(() => {
+        document.getElementById("ip").textContent = "Unable to fetch IP";
+    });
+</script>
+
+</body>
+</html>
