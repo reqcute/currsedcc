@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>currsed.cc</title>
+   
+    <!-- Single C Purple Neon Favicon -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='512' height='512'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23c026d3'/%3E%3Cstop offset='100%25' stop-color='%23a855f7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='42' fill='none' stroke='%23c026d3' stroke-width='9' opacity='0.3'/%3E%3Ccircle cx='50' cy='50' r='38' fill='none' stroke='url(%23g)' stroke-width='14'/%3E%3Ctext x='50' y='68' font-size='62' font-weight='700' text-anchor='middle' fill='%23ffffff' font-family='Arial Black, sans-serif'%3EC%3C/text%3E%3C/svg%3E" type="image/svg+xml">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0614;
+            color: #e5e5e5;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        .header {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(168, 85, 247, 0.15);
+        }
+        .logo {
+            font-size: 26px;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+        .logo strong {
+            background: linear-gradient(90deg, #c026d3, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .search-bar {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 9999px;
+            padding: 12px 20px;
+            width: 340px;
+            color: white;
+            font-size: 15px;
+        }
+        .search-bar:focus {
+            outline: none;
+            border-color: #c026d3;
+            box-shadow: 0 0 0 3px rgba(192, 38, 211, 0.2);
+        }
+        .cart-btn {
+            background: linear-gradient(90deg, #a855f7, #c026d3);
+            color: white;
+            font-weight: 600;
+            padding: 12px 28px;
+            border-radius: 9999px;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+            transition: all 0.3s;
+        }
+        .cart-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.7);
+        }
+        .support-btn {
+            background: #5865F2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .support-btn:hover {
+            background: #4752C4;
+            transform: translateY(-2px);
+        }
+        .main-content {
+            position: relative;
+            z-index: 10;
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .live-catalog {
+            background: rgba(20, 15, 35, 0.95);
+            border: 1px solid rgba(168, 85, 247, 0.25);
+            border-radius: 20px;
+            padding: 28px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 0 40px rgba(168, 85, 247, 0.15);
+        }
+        .live-badge {
+            background: linear-gradient(90deg, #c026d3, #a855f7);
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 6px 18px;
+            border-radius: 9999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 20px rgba(192, 38, 211, 0.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .live-badge:hover {
+            transform: scale(1.08) translateY(-2px);
+            box-shadow: 0 0 35px rgba(192, 38, 211, 0.8);
+        }
+        .groups-header {
+            margin-bottom: 24px;
+            font-size: 26px;
+            font-weight: 700;
+            color: #e0e7ff;
+            text-shadow:
+                0 0 10px #c026d3,
+                0 0 20px #c026d3,
+                0 0 40px #a855f7,
+                0 0 60px #a855f7;
+        }
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+        }
+        .group-card {
+            background: rgba(30, 25, 50, 0.9);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.4s;
+        }
+        .group-card:hover {
+            transform: translateY(-8px);
+            border-color: #c026d3;
+            box-shadow: 0 0 35px rgba(192, 38, 211, 0.4);
+        }
+        .group-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 19px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #f3e8ff;
+            letter-spacing: -0.02em;
+        }
+        .product-count {
+            font-family: 'Inter', sans-serif;
+            font-size: 14.5px;
+            font-weight: 500;
+            color: #b3a8cc;
+        }
+        .new-badge {
+            background: linear-gradient(90deg, #c026d3, #a855f7);
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 9999px;
+            margin-left: 8px;
+            box-shadow: 0 0 15px rgba(192, 38, 211, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="starfield"></canvas>
+    
+    <!-- Header -->
+    <div class="header">
+        <a href="#" class="logo"><strong>currsed.cc</strong></a>
+       
+        <input type="text" class="search-bar" placeholder="Search products...">
+        
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <button class="cart-btn">Cart (0)</button>
+            
+            <!-- Updated Support Button -->
+            <a href="https://discord.gg/BDFQMJ7TEB" target="_blank" rel="noopener noreferrer" class="support-btn">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 12C20 16.4183 16.4183 20 12 20C10.9082 20 9.871 19.7357 8.95017 19.2571L4 20L5.00017 15.9999C4.264 14.9999 4 13.9999 4 12C4 7.58172 7.58172 4 12 4C16.4183 4 20 7.58172 20 12Z"/>
+                </svg>
+                Support
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="live-catalog">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+                <span class="live-badge">
+                    ● Live catalog
+                </span>
+            </div>
+           
+            <h2 class="groups-header">Roblox/Rivals</h2>
+           
+            <div class="groups-grid">
+                <div class="group-card">
+                    <div class="group-title">Rivals Configs</div>
+                    <div class="product-count">5 products</div>
+                </div>
+                <div class="group-card">
+                    <div class="group-title">Roblox Rivals Accounts</div>
+                    <div class="product-count">10 products</div>
+                </div>
+                <div class="group-card">
+                    <div class="group-title">Roblox Followers</div>
+                    <div class="product-count">9 products</div>
+                </div>
+                <div class="group-card">
+                    <div class="group-title">Roblox 4L/4C <span class="new-badge">NEW!</span></div>
+                    <div class="product-count">1 product</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+        let width, height;
+        
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        
+        class Star {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 1.5 + 0.4;
+                this.speed = Math.random() * 0.35 + 0.08;
+                this.vx = (Math.random() - 0.5) * 0.3;
+            }
+            update() {
+                this.y += this.speed;
+                this.x += this.vx;
+                this.vx += (Math.random() - 0.5) * 0.015;
+                if (Math.abs(this.vx) > 0.5) this.vx *= 0.95;
+                if (this.y > height + 10) {
+                    this.y = -10;
+                    this.x = Math.random() * width;
+                }
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+            }
+            draw() {
+                ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.55})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        function initStars() {
+            stars = [];
+            for (let i = 0; i < 340; i++) {
+                stars.push(new Star());
+            }
+        }
+        
+        function animate() {
+            ctx.fillStyle = 'rgba(10, 6, 20, 0.18)';
+            ctx.fillRect(0, 0, width, height);
+            stars.forEach(star => { star.update(); star.draw(); });
+            requestAnimationFrame(animate);
+        }
+        
+        window.addEventListener('resize', () => { resize(); initStars(); });
+        resize();
+        initStars();
+        animate();
+    </script>
+</body>
+</html>
